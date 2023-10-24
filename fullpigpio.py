@@ -2,36 +2,31 @@ import os
 from time import sleep
 import pigpio
 
-
 pi = pigpio.pi()
 
-pi.setmode(pi.BCM)
+#pi.setmode(pi.BCM)
 
-pi.setup(13,pi.OUT )
-pi.setup(12,pi.OUT )
-pi.setup(18, pi.OUT)
+#pi.setup(13, pigpio.OUT )
+#pi.setup(12, pigpio.OUT )
+#pi.setup(18, pigpio.OUT) 
 
-servo= pi.PWM(18)
+servo = pi.set_mode(18, pigpio.OUTPUT)
 pi.set_PWM_frequency(18, 50)
 servo.start(0)
 
-ESC1_GPIO= pi.PWM(12)  #informa o pino que a ESC ta conectada
+ESC1_GPIO= pi.set_mode(12, pigpio.OUTPUT)  #pigpio.PWM(12)  
 pi.set_servo_pulsewidth(ESC1_GPIO, 0)
 pi.set_PWM_frequency(12, 50)
 
-ESC2_GPIO= pi.PWM (13)  #informa o pino que a ESC ta conectada
+ESC2_GPIO= pi.set_mode(13, pigpio.OUTPUT) 
 pi.set_servo_pulsewidth(ESC2_GPIO, 0)
 pi.set_PWM_frequency(13, 50)
 
-
-max_value = 2000 #valores max e min de largura de pulso da ESC
+max_value = 2000 
 min_value = 700
-#sem o comando manual
+
 print(" OBRIGATÓRIO: insira calibrate para calibrar a ESC em primeiro lançamento")
 print("Se a ESC ja estiver calibrada, digite control, arm OU stop ")
-#arm para armar a esc se ela já estiver calibrada
-#control para inicializar e controlar a velocidade
-
 
 def calibrate():   #calibrar a ESC
     print("vamos calibrar a ESC")
@@ -48,15 +43,15 @@ def calibrate():   #calibrar a ESC
           pi.set_servo_pulsewidth(ESC1_GPIO, min_value)
           pi.set_servo_pulsewidth(ESC2_GPIO, min_value)
           print('bip')
-          sleep(4)
+          sleep(1)
           print('quase lá...')
           pi.set_servo_pulsewidth(ESC1_GPIO,0)
           pi.set_servo_pulsewidth(ESC2_GPIO,0)
-          sleep(2)
+          sleep(1)
           print("armar a ESC")
           pi.set_servo_pulsewidth(ESC1_GPIO,min_value)
           pi.set_servo_pulsewidth(ESC2_GPIO,min_value)
-          sleep(2)
+          sleep(1)
           print('ESC armada! batmovel pronto pra ação')
           control()
           SetAngle()
@@ -128,3 +123,13 @@ def stop():
     pi.set_servo_pulsewidth(ESC2_GPIO,0)
     servo.stop()
     pi.stop()
+
+inp = input()
+if inp == "calibrate":
+    calibrate()
+elif inp == "arm":
+    arm()
+elif inp == "control":
+    control()
+elif inp == "stop":
+    stop()
