@@ -10,15 +10,19 @@ pi = pigpio.pi()
 #pi.setup(12, pigpio.OUT )
 #pi.setup(18, pigpio.OUT) 
 
-servo = pi.set_mode(18, pigpio.OUTPUT)
+servo = (18) 
+pi.set_mode(18, pigpio.OUTPUT)
+pi.set_servo_pulsewidth(servo, 0)
 pi.set_PWM_frequency(18, 50)
-servo.start(0)
 
-ESC1_GPIO= pi.set_mode(12, pigpio.OUTPUT)  #pigpio.PWM(12)  
+
+ESC1_GPIO = (12)
+pi.set_mode(12, pigpio.OUTPUT)  #pigpio.PWM(12)  
 pi.set_servo_pulsewidth(ESC1_GPIO, 0)
 pi.set_PWM_frequency(12, 50)
 
-ESC2_GPIO= pi.set_mode(13, pigpio.OUTPUT) 
+ESC2_GPIO=(13) 
+pi.set_mode(13, pigpio.OUTPUT) 
 pi.set_servo_pulsewidth(ESC2_GPIO, 0)
 pi.set_PWM_frequency(13, 50)
 
@@ -37,7 +41,7 @@ def calibrate():   #calibrar a ESC
     if inp=='':
       pi.set_servo_pulsewidth(ESC1_GPIO,max_value)
       pi.set_servo_pulsewidth(ESC2_GPIO,max_value)
-      print("se n escutar um bip bip e um tom gradual é pq deu ruim")
+      print(" conecte a bateria, se n escutar um bip bip e um tom gradual é pq deu ruim")
       inp=input()
       if inp == '':
           pi.set_servo_pulsewidth(ESC1_GPIO, min_value)
@@ -54,7 +58,7 @@ def calibrate():   #calibrar a ESC
           sleep(1)
           print('ESC armada! batmovel pronto pra ação')
           control()
-          SetAngle()
+          servo()
 
 
 def control():
@@ -66,16 +70,16 @@ def control():
         pi.set_servo_pulsewidth(ESC1_GPIO, speed)
         pi.set_servo_pulsewidth(ESC2_GPIO, speed)
         inp = input()
-        if inp == "q":
+        if inp == "--":
             speed -= 100
             print("speed =", speed)
-        elif inp == "e":
+        elif inp == "++":
             speed += 100
             print("speed =", speed)
-        elif inp == "d":
+        elif inp == "+":
             speed += 10
             print("speed =", speed)
-        elif inp == "a":
+        elif inp == "-":
             speed -= 10
             print("speed =", speed)
         elif inp == "stop":
@@ -87,20 +91,30 @@ def control():
         else:
             print("Press a, q, d, or e")
 
-def SetAngle(angle):
-    duty= angle/18 + 2 #2 é o menor possível
-    pi.output(18,True)
-    servo.ChangeDutyCycle(duty)
-    sleep(1)
-    pi.output(18, False)
-    servo.ChangeDutyCycle(0)
+def servo(): #angle:
+    print("ok funçaop")
+   # for angle in [90, 0, 180]:
+        print("Definindo para zero...")
+        pi.set_servo_pulsewidth(18, 1000)  # Duty cycle correspondente a 5% (zero graus)
+        sleep(1)
+        print("Definindo para 180...")
+        pi.set_servo_pulsewidth(18, 2000)
+        print("def pra 90")
+        pi.set_servo_pulsewidth(18, 1500)
 
-    SetAngle(90) #90/18= 5 +2 = 7
-    sleep(2)
-    SetAngle(0) #2 (min)
-    sleep (2)
-    SetAngle(180) #180/18 + 2 = 12 (max)
-    sleep(2)
+     #duty= angle/18 + 2 #2 é o menor possível
+
+       # pi.OUTPUT(18,True)
+        #servo.ChangeDutyCycle(duty)
+      #  pi.OUTPUT(18, False)
+        #servo.ChangeDutyCycle(0)
+
+    # SetAngle(90) #90/18= 5 +2 = 7
+    # sleep(2)
+    # SetAngle(0) #2 (min)
+    # sleep (2)
+    # SetAngle(180) #180/18 + 2 = 12 (max)
+    # sleep(2)
 
 def arm(): #arma a ESC depois que ela ja está calibrada
     print("caso a ESC já esteja calibrada mas não armada,conecte a bateria e aperte ENTER")
@@ -116,12 +130,12 @@ def arm(): #arma a ESC depois que ela ja está calibrada
         pi.set_servo_pulsewidth(ESC2_GPIO, min_value)
         sleep(1)
         control()
-        SetAngle()
+        servo()
 
 def stop():
     pi.set_servo_pulsewidth(ESC1_GPIO,0)
     pi.set_servo_pulsewidth(ESC2_GPIO,0)
-    servo.stop()
+    #servo.stop()
     pi.stop()
 
 inp = input()
@@ -133,3 +147,5 @@ elif inp == "control":
     control()
 elif inp == "stop":
     stop()
+elif inp == "servo":
+    servo()
